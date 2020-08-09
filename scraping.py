@@ -21,6 +21,7 @@ def scrape_all():
         "last_modified": dt.datetime.now()
     }
 
+    print(data['Hemispheres'])
     # Stop webdriver and return data
     browser.quit()
     return data
