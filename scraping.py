@@ -17,6 +17,7 @@ def scrape_all():
         "news_paragraph": news_paragraph,
         "featured_image": featured_image(browser),
         "facts": mars_facts(),
+        "Hemispheres": Hemispheres(browser),
         "last_modified": dt.datetime.now()
     }
 
@@ -83,20 +84,20 @@ def featured_image(browser):
     img_url = f'https://www.jpl.nasa.gov{img_url_rel}'
 
     return img_url 
- 
+
 # ## Mars Facts
  
 def mars_facts():
     # Add try/except for error handling
     try:
         # Use 'read_html' to scrape the facts table into a dataframe
-        df = pd.read_html('http://space-facts.com/mars/')[0]
+        df = pd.read_html('http://space-facts.com/mars/')[1]
 
     except BaseException:
         return None
     
     # Assign columns and set index of dataframe
-    df.columns=['Description', 'Mars']
+    df.columns=['Description', 'Mars', 'Earth']
     df.set_index('Description', inplace=True)
     
     # Convert dataframe into HTML format, add bootstrap
@@ -106,3 +107,27 @@ if __name__ == "__main__":
     # If running as script, print scraped data
     print(scrape_all())
 
+#Hemisphere
+
+def Hemispheres(browser):
+
+    # Visit URL
+    url = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
+    browser.visit(url)
+
+    
+    #Create an empty list to store the dictionary for img_url and title
+    list_of_dicts = []
+
+    #Loop through and scrape image urls
+    for i in range (4):
+        browser.find_by_css('a.product-item h3')[i].click()
+        hemi_html = browser.html
+        hemi_soup = soup(hemi_html, 'html.parser')
+        title = hemi_soup.find('h2').text
+        img_url_hem = hemi_soup.find('a', text="Sample").get('href')
+        hems_dictionary = {'title':title,'img_url_hem':img_url_hem}
+        list_of_dicts.append(hems_dictionary)
+        browser.back()
+
+    return list_of_dicts
